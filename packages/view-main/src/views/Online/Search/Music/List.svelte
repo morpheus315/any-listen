@@ -63,7 +63,8 @@
         } else {
           listInfo.error = true
         }
-        list = []
+        // Only clear on first load when there are no previous results
+        if (list.length === 0) list = []
       })
       .finally(() => {
         if (currentSearchId === searchId) loading = false
