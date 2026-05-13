@@ -3,60 +3,31 @@ name: Release
 on:
   push:
     tags:
-      - 'desktop-v*'
-      - 'webserver-v*'
-env:
-  DESKTOP_REPO: any-listen-desktop
-  WEBSERVER_REPO: any-listen-web-server-native-lib
+      - 'v*'
 
 jobs:
-  sync-desktop-app:
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref_name, 'desktop-')
+  build-windows:
+    runs-on: windows-latest
     steps:
-      - name: Checkout desktop app
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
         with:
-          repository: any-listen/${{ env.DESKTOP_REPO }}
-          token: ${{ secrets.GH_DESKTOP_PAT }}
+          version: '10'
 
-      - name: Checkout monorepo
-        uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
         with:
-          path: any-listen
-          token: ${{ github.token }}
+          node-version: '22'
+          cache: 'pnpm'
 
-      - name: Push Code
-        run: |
-          git config user.name "lyswhut"
-          git config user.email "lyswhut@qq.com"
-          git add .
-          tag_formated=$(echo ${{ github.ref_name }} | sed 's/desktop-v\?//')
-          git commit -m "Release v$tag_formated"
-          git remote set-url origin https://x-access-token:${{ secrets.GH_DESKTOP_PAT }}@github.com/any-listen/${{ env.DESKTOP_REPO }}.git
-          git push origin main
+      - run: pnpm install
 
-  sync-web-server:
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref_name, 'webserver-')
-    steps:
-      - name: Checkout web server
-        uses: actions/checkout@v6
+      - run: pnpm build:desktop
+
+      - uses: softprops/action-gh-release@v2
         with:
-          repository: any-listen/${{ env.WEBSERVER_REPO }}
-          submodules: 'true'
-          token: ${{ secrets.GH_WEB_SERVER_PAT }}
-
-      - name: Sync code
-        run: |
-          git submodule update --remote
-
-      - name: Push Code
-        run: |
-          git config user.name "lyswhut"
-          git config user.email "lyswhut@qq.com"
-          git add .
-          tag_formated=$(echo ${{ github.ref_name }} | sed 's/webserver-v\?//')
-          git commit -m "release: v$tag_formated"
-          git remote set-url origin https://x-access-token:${{ secrets.GH_WEB_SERVER_PAT }}@github.com/any-listen/${{ env.WEBSERVER_REPO }}.git
-          git push origin main
+          files: |
+            packages/desktop/dist/*.exe
+            packages/desktop/dist/*.7z
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') }}
