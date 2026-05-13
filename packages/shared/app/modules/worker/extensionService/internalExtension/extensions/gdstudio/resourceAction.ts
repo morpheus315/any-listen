@@ -40,6 +40,11 @@ export const resourceActions: Partial<AnyListen.IPCExtension.ResourceAction> = {
       pages: page,
     })
 
+    if (!result) {
+      console.log('[gdstudio] search returned null after retries')
+      return { list: [], total: 0, page, limit }
+    }
+
     const items: Record<string, unknown>[] = Array.isArray(result) ? result : (result.data || result.list || [])
     const list = items.map((item) => buildMusicInfo(item, params.source))
 

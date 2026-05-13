@@ -53,7 +53,8 @@
       .then(({ list: _list, total }) => {
         if (currentSearchId !== searchId) return
         listInfo.total = total
-        list = _list
+        // Keep previous results when API returns empty (don't clear the list)
+        if (_list.length > 0 || list.length === 0) list = _list
       })
       .catch((err: Error) => {
         if (currentSearchId !== searchId) return

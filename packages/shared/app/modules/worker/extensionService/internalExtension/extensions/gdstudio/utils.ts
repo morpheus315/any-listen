@@ -44,23 +44,59 @@ export function buildUrl(base: string, params: Record<string, string | number | 
   return parts.length ? `${base}?${parts.join('&')}` : base
 }
 
-export async function apiRequest(params: Record<string, string | number | undefined | null>): Promise<any> {
-  const url = buildUrl(API_BASE, params)
+function isEmptyResponse(data: unknown): boolean {
+  if (data == null) return true
+  if (Array.isArray(data)) return data.length === 0
+  if (typeof data === 'object') {
+    if ('url' in data) return false
+    if ('lyric' in data || 'tlyric' in data) return false
+    if (Array.isArray((data as Record<string, unknown>).list)) {
+      return ((data as Record<string, unknown>).list as unknown[]).length === 0
+    }
+    if (Array.isArray((data as Record<string, unknown>).data)) {
+      return ((data as Record<string, unknown>).data as unknown[]).length === 0
+    }
+  }
+  return false
+}
 
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'User-Agent': 'any-listen/1.0',
-      Accept: 'application/json',
-    },
-  })
+const MAX_RETRIES = 10
+const RETRY_DELAY = 1000
 
-  if (!response.ok) {
-    const text = await response.text()
-    throw new Error(`API request failed with status ${response.status}: ${text}`)
+export async function apiRequest(
+  params: Record<string, string | number | undefined | null>,
+  retryOnEmpty = true
+): Promise<any> {
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    if (attempt > 0) {
+      console.log(`[gdstudio] retry ${attempt}/${MAX_RETRIES} after ${RETRY_DELAY}ms`)
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY))
+    }
+
+    const url = buildUrl(API_BASE, params)
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'any-listen/1.0',
+        Accept: 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      const text = await response.text()
+      throw new Error(`API request failed with status ${response.status}: ${text}`)
+    }
+
+    const data = await response.json()
+
+    if (!retryOnEmpty || !isEmptyResponse(data)) return data
+
+    if (attempt < MAX_RETRIES) {
+      console.log(`[gdstudio] empty response, will retry`)
+    }
   }
 
-  return response.json()
+  return null
 }
 
 export function pickFirst<T>(result: T | T[]): T {

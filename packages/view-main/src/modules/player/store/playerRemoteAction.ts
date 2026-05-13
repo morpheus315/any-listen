@@ -5,6 +5,7 @@ import { musicLibraryEvent } from '@/modules/musicLibrary/store/event'
 import { getMusicPic as getMusicPicFromRemote, getMusicUrl as getMusicUrlFromRemote } from '@/shared/ipc/music'
 import { sendPlayerEvent, sendPlayHistoryListAction } from '@/shared/ipc/player'
 import { playerActionEvent, playHistoryListActionEvent } from '@/shared/ipc/player/event'
+import { cacheSongPic, songMetaCache } from './songMetaCache.svelte'
 
 import * as commit from './commit'
 import { playerEvent } from './event'
@@ -53,6 +54,8 @@ const handleGetMusicPic = async (info: AnyListen.IPCMusic.GetMusicPicInfo) => {
       if (picCacheQueue.length > 100) {
         picCache.delete(picCacheQueue.shift()!)
       }
+      // Persist to localStorage cache
+      cacheSongPic(info.musicInfo.id, urlInfo.url)
       return urlInfo
     })
     .finally(() => {
@@ -81,6 +84,12 @@ export const getMusicPic = async (info: AnyListen.IPCMusic.GetMusicPicInfo): Pro
         url: info.musicInfo.meta.picUrl,
         isFromCache: true,
       }
+    }
+
+    // Check persistent cache
+    const cached = songMetaCache.get(info.musicInfo.id)
+    if (cached?.picUrl) {
+      return { url: cached.picUrl, isFromCache: true }
     }
   }
   return handleGetMusicPic(info)

@@ -10,6 +10,7 @@ import { onPlayerCreated } from '../shared'
 import { setMaxPlayTime, setNowPlayTime, skipNext } from '../store/actions'
 import { playerEvent } from '../store/event'
 import { playerState } from '../store/state'
+import { cacheSongInterval } from '../store/songMetaCache.svelte'
 
 // const delaySavePlayInfo = throttle(savePlayInfo, 2000)
 
@@ -101,10 +102,12 @@ export const initProgress = () => {
         playerEvent.on('playerLoadeddata', () => {
           setMaxPlayTime(getDuration())
           if (playerState.playMusicInfo && !playerState.playMusicInfo.musicInfo.interval) {
+            const interval = formatPlayTime2(playerState.progress.maxPlayTime)
             void updateListMusic(playerState.playMusicInfo.listId, {
               ...playerState.playMusicInfo.musicInfo,
-              interval: formatPlayTime2(playerState.progress.maxPlayTime),
+              interval,
             })
+            cacheSongInterval(playerState.playMusicInfo.musicInfo.id, interval)
           }
         })
       )

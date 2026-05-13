@@ -9,6 +9,7 @@
   import { onMount, tick } from 'svelte'
   import { getMusicPicDelay } from '@/modules/player/store/actions'
   import { currentQualities } from '@/modules/player/store/qualityLabels.svelte'
+  import { songMetaCache } from '@/modules/player/store/songMetaCache.svelte'
   // console.log(querystring)
   let {
     musicinfo,
@@ -38,6 +39,12 @@
     if (musicinfo.isLocal || listid === 'search') return base
     const q = currentQualities.get(musicinfo.id)
     return q ? `${base} · ${q}` : base
+  })
+
+  let displayInterval = $derived.by(() => {
+    if (musicinfo.interval) return musicinfo.interval
+    const cached = songMetaCache.get(musicinfo.id)
+    return cached?.interval || '--/--'
   })
   let picUrl = $state<null | string>(null)
   // let isPlaying = $derived(isplaylist && $playInfo.index === index)
@@ -113,7 +120,7 @@
     <span class="select" aria-label={musicinfo.meta.albumName}>{musicinfo.meta.albumName}</span>
   </div>
   <div class="list-item-cell" style="flex: 0 0 9%;">
-    <span class="no-select">{musicinfo.interval || '--/--'}</span>
+    <span class="no-select">{displayInterval}</span>
   </div>
 </div>
 
