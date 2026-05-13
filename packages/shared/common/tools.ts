@@ -57,6 +57,19 @@ export const createPlayMusicInfoList = ({
 
 export const buildMusicName = (setting: AnyListen.AppSetting['download.fileName'], name: string, singer: string) =>
   singer ? setting.replace('%name%', name).replace('%singer%', singer) : name
+const SOURCE_DISPLAY_MAP: Record<string, string> = {
+  'gd-netease': '网易云',
+  'gd-kuwo': '酷我',
+  'gd-tencent': 'QQ',
+  'gd-bilibili': 'B站',
+  'gd-tidal': 'Tidal',
+  'gd-qobuz': 'Qobuz',
+  'gd-joox': 'Joox',
+  'gd-apple': 'Apple',
+  'gd-ytmusic': 'YT',
+  'gd-spotify': 'Spotify',
+}
+
 export const buildSourceLabel = (musicinfo: AnyListen.Music.MusicInfo) => {
   if (musicinfo.isLocal) {
     switch (musicinfo.meta.ext) {
@@ -69,7 +82,7 @@ export const buildSourceLabel = (musicinfo: AnyListen.Music.MusicInfo) => {
         return musicinfo.meta.bitrateLabel?.toUpperCase() ?? ''
     }
   }
-  return musicinfo.meta.source
+  return SOURCE_DISPLAY_MAP[musicinfo.meta.source] || musicinfo.meta.source || ''
 }
 
 export const logFormat = (log: AnyListen.LogInfo) => {

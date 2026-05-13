@@ -8,6 +8,7 @@
   import { buildSourceLabel } from '@any-listen/common/tools'
   import { onMount, tick } from 'svelte'
   import { getMusicPicDelay } from '@/modules/player/store/actions'
+  import { currentQualities } from '@/modules/player/store/qualityLabels.svelte'
   // console.log(querystring)
   let {
     musicinfo,
@@ -32,7 +33,12 @@
     onclick: (isKey: boolean) => void
   } = $props()
 
-  let sourceLabel = $derived(buildSourceLabel(musicinfo))
+  let sourceLabel = $derived.by(() => {
+    const base = buildSourceLabel(musicinfo)
+    if (musicinfo.isLocal || listid === 'search') return base
+    const q = currentQualities.get(musicinfo.id)
+    return q ? `${base} · ${q}` : base
+  })
   let picUrl = $state<null | string>(null)
   // let isPlaying = $derived(isplaylist && $playInfo.index === index)
 

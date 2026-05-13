@@ -16,6 +16,7 @@
   import { LIST_IDS } from '@any-listen/common/constants'
   import { resourceList } from '@/modules/extension/reactive.svelte'
   import { LIST_PIC_ICON } from '@/shared/constants'
+  import { getQualityVersion } from '@/modules/player/store/qualityLabels.svelte'
 
   let list = $state.raw<AnyListen.Music.MusicInfo[]>([])
   let musicList = $state<ComponentExports<typeof MusicList> | null>(null)
@@ -106,6 +107,15 @@
     const id = $query.id
     if (!$userListsAll.some((l) => l.id == id) && $userListInited) {
       void replace(`/library?id=${LIST_IDS.LOVE}`)
+    }
+  })
+
+  let prevVersion = $state(0)
+  $effect(() => {
+    const v = getQualityVersion()
+    if (v !== prevVersion && list.length) {
+      prevVersion = v
+      list = [...list]
     }
   })
 </script>

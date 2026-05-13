@@ -5,49 +5,67 @@
   import Pagination from '@/components/material/Pagination.svelte'
   import { search } from '@/modules/extension/onlineResource/search/music/actions'
   import { query, push } from '@/plugins/routes'
+  import { t } from '@/plugins/i18n'
 
-  let { source }: { source?: SourceType } = $props()
+  let {
+    source,
+    loading = $bindable(false),
+  }: {
+    source?: SourceType
+    loading?: boolean
+  } = $props()
+
   let list = $state.raw<AnyListen.Music.MusicInfoOnline[]>([])
   let listInfo = $state<{
     total: number
     page: number
     limit: number
-    loading: boolean
     error: boolean
-  }>({ total: 0, page: 1, limit: 20, loading: false, error: false })
+    timeout: boolean
+  }>({ total: 0, page: 1, limit: 20, error: false, timeout: false })
   const searchInfo = {
     extId: '',
     source: '',
     text: '',
   }
+  let currentSearchId = $state('')
+
+  const SEARCH_TIMEOUT = 10_000
 
   const handleSearch = (page: number, text?: string) => {
     let extId = (searchInfo.extId = source!.extensionId)
     let sourceId = (searchInfo.source = source!.id)
     if (text != null) searchInfo.text = text
     listInfo.page = page
+    listInfo.error = false
+    listInfo.timeout = false
     const searchId = `${searchInfo.extId}_${searchInfo.source}_${searchInfo.text}_${listInfo.page}`
-    listInfo.loading = true
-    void search(extId, sourceId, searchInfo.text, '', page, listInfo.limit)
+    currentSearchId = searchId
+    loading = true
+
+    const searchPromise = search(extId, sourceId, searchInfo.text, '', page, listInfo.limit)
+
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('SEARCH_TIMEOUT')), SEARCH_TIMEOUT)
+    })
+
+    void Promise.race([searchPromise, timeoutPromise])
       .then(({ list: _list, total }) => {
-        if (searchId != `${searchInfo.extId}_${searchInfo.source}_${searchInfo.text}_${listInfo.page}`) {
-          return
-        }
+        if (currentSearchId !== searchId) return
         listInfo.total = total
-        listInfo.error = false
         list = _list
-        // console.log(_list)
       })
-      .catch((err) => {
-        console.log(err)
-        if (searchId != `${searchInfo.extId}_${searchInfo.source}_${searchInfo.text}_${listInfo.page}`) {
-          return
+      .catch((err: Error) => {
+        if (currentSearchId !== searchId) return
+        if (err.message === 'SEARCH_TIMEOUT') {
+          listInfo.timeout = true
+        } else {
+          listInfo.error = true
         }
-        listInfo.error = true
         list = []
       })
       .finally(() => {
-        listInfo.loading = false
+        if (currentSearchId === searchId) loading = false
       })
   }
 
@@ -65,27 +83,42 @@
 
 <div class="music-list">
   {#if source}
-    <MusicList
-      {list}
-      miniheader
-      listinfo={{
-        id: 'search',
-        name: 'search',
-      }}
-    />
-    <div class="pagination">
-      <Pagination
-        count={listInfo.total}
-        page={listInfo.page}
-        limit={listInfo.limit}
-        onclick={(page) => {
-          void push('/online', {
-            ...$query,
-            page,
-          })
+    {#if loading}
+      <div class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <span class="loading-text">{$t('loading')}</span>
+      </div>
+    {:else if listInfo.timeout}
+      <div class="status-message error">{$t('search__load_failed')}</div>
+    {:else if listInfo.error}
+      <div class="status-message error">{$t('search__load_failed')}</div>
+    {:else if !list.length}
+      <Empty />
+    {:else}
+      <MusicList
+        {list}
+        miniheader
+        listinfo={{
+          id: 'search',
+          name: 'search',
         }}
       />
-    </div>
+    {/if}
+    {#if !loading && list.length}
+      <div class="pagination">
+        <Pagination
+          count={listInfo.total}
+          page={listInfo.page}
+          limit={listInfo.limit}
+          onclick={(page) => {
+            void push('/online', {
+              ...$query,
+              page,
+            })
+          }}
+        />
+      </div>
+    {/if}
   {:else}
     <Empty />
   {/if}
@@ -98,6 +131,42 @@
     flex-flow: column nowrap;
     min-width: 0;
     overflow: hidden;
+    position: relative;
+  }
+  .loading-overlay {
+    display: flex;
+    flex: auto;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--color-primary-light-300-alpha-700);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .loading-text {
+    font-size: 13px;
+    color: var(--color-primary-font);
+  }
+  .status-message {
+    display: flex;
+    flex: auto;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    &.error {
+      color: var(--color-font-error);
+    }
   }
   .pagination {
     display: flex;

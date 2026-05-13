@@ -5,12 +5,13 @@ import { joinPath } from '@any-listen/nodejs'
 import { formatManifest } from '../../shared'
 import { extensionState } from '../../state'
 import type { ExtensionContext, ExtensionHostContext } from './type'
+import * as gdstudio from './gdstudio'
 import * as webdav from './webdav'
 
 export const extensions: Array<{
   setup: (extension: AnyListen.Extension.Extension, content: ExtensionHostContext) => Promise<ExtensionContext>
   pkg: AnyListen.Extension.Manifest
-}> = [webdav]
+}> = [webdav, gdstudio]
 
 type Extension = (typeof extensions)[number]
 

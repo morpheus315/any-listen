@@ -12,13 +12,13 @@
 
   let menus = $derived(
     [
-      // {
-      //   to: '/search',
-      //   name: $t('search'),
-      //   icon: '#icon-search-2',
-      //   iconSize: '0 0 425.2 425.2',
-      //   enable: true,
-      // },
+      {
+        to: '/online?type=search',
+        name: $t('search'),
+        icon: '#icon-search-2',
+        iconSize: '0 0 425.2 425.2',
+        enable: true,
+      },
       // {
       //   to: '/songList/list',
       //   name: $t('song_list'),
@@ -83,11 +83,13 @@
   let activePath = $derived(
     $location == '/library' && $query.id == LIST_IDS.LAST_PLAYED
       ? lastPlayedUrl
-      : menus.some((m) => m.to == $location)
-        ? $location
-        : $location == '/'
-          ? menus[0].to
-          : ''
+      : $location == '/online' && $query.type == 'search'
+        ? '/online?type=search'
+        : menus.some((m) => m.to == $location)
+          ? $location
+          : $location == '/'
+            ? menus[0].to
+            : ''
   )
   // let activePath = ''
 </script>

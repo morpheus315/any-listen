@@ -4,13 +4,24 @@ import { showSimpleConfirmModal } from '@/components/apis/dialog'
 import { addInfo } from '@/modules/dislikeList/actions'
 import { hasDislike } from '@/modules/dislikeList/store/actions'
 import { getListMusics, removeListMusics } from '@/modules/musicLibrary/actions'
-import { addPlayLaterMusic, playList, skipNext } from '@/modules/player/store/actions'
+import { addPlayLaterMusic, playList, playOnlineList, skipNext } from '@/modules/player/store/actions'
 import { playerState } from '@/modules/player/store/state'
 import { settingState } from '@/modules/setting/store/state'
 import { i18n } from '@/plugins/i18n'
 import { clipboardWriteText, openDirInExplorer } from '@/shared/ipc/app'
 
 export const playMusic = async (listId: string, musicInfo: AnyListen.Music.MusicInfo, isClianHistory?: boolean) => {
+  // For online music that's not in a persisted list (e.g. search results), play directly
+  if (!musicInfo.isLocal) {
+    const list = await getListMusics(listId)
+    const idx = list.findIndex((m) => m.id == musicInfo.id)
+    if (idx < 0) {
+      void playOnlineList(listId, [musicInfo], 0, isClianHistory)
+      return
+    }
+    void playList(listId, list, idx, isClianHistory)
+    return
+  }
   const list = await getListMusics(listId)
   const idx = list.findIndex((m) => m.id == musicInfo.id)
   if (idx < 0) return

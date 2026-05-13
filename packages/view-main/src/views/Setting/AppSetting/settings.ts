@@ -159,6 +159,18 @@ export const settings: SettingListSection[] = [
           }
         : null,
       {
+        field: 'player.playQuality',
+        name: 'settings.player.play_quality',
+        type: 'selection',
+        enum: [
+          { value: '128k', name: 'settings.player.play_quality_128k' },
+          { value: '192k', name: 'settings.player.play_quality_192k' },
+          { value: '320k', name: 'settings.player.play_quality_320k' },
+          { value: 'flac', name: 'settings.player.play_quality_flac' },
+          { value: 'flac24bit', name: 'settings.player.play_quality_flac24bit' },
+        ],
+      },
+      {
         field: 'player.isSavePlayTime',
         name: 'settings__play_save_play_time',
         type: 'boolean',

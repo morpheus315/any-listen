@@ -17,6 +17,7 @@ import * as commit from './commit'
 import { playerEvent } from './event'
 import { setPlayListMusic, setPlayListMusicPlayed, setPlayListMusicUnplayedAll } from './listRemoteAction'
 import { addPlayHistoryList, getMusicLyric, getMusicPic, getMusicUrl, setPlayHistoryList } from './playerRemoteAction'
+import { setQuality } from './qualityLabels.svelte'
 import { playerState } from './state'
 
 let gettingUrlId = ''
@@ -95,11 +96,12 @@ const getMusicPlayUrl = async (
 
   // const type = getPlayType(settingState.setting['player.playQuality'], musicInfo)
 
-  return getMusicUrl({ musicInfo, isRefresh })
-    .then(({ url }) => {
-      console.log('url', url)
+  return getMusicUrl({ musicInfo, isRefresh, quality: settingState.setting['player.playQuality'] })
+    .then(({ url, quality }) => {
+      if (!musicInfo.isLocal && quality) {
+        setQuality(musicInfo.id, quality)
+      }
       if (diffCurrentMusicInfo(musicInfo)) return null
-      // console.log(url)
       return url
     })
     .catch(async (err: Error) => {

@@ -53,6 +53,7 @@ export {
   playId,
   playIndex,
   playList,
+  playOnlineList,
   release,
   seekTo,
   setCollectStatus,
