@@ -51,8 +51,8 @@ const options = {
   publish: [
     {
       provider: 'github',
-      owner: 'any-listen',
-      repo: 'any-listen-desktop',
+      owner: 'morpheus315',
+      repo: 'any-listen',
     },
   ],
 }
