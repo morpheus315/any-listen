@@ -102,10 +102,6 @@ export const buildSongCacheKey = buildSongId
 export const buildMusicCacheId = (musicInfo: AnyListen.Music.MusicInfo, quality: string) => {
   return `${buildSongCacheKey(musicInfo)}_${quality}`
 }
-
-export const buildMusicCacheId = (musicInfo: AnyListen.Music.MusicInfo, quality: string) => {
-  return `${buildSongCacheKey(musicInfo)}_${quality}`
-}
 export const getFileType = (quality: string): AnyListen.Music.FileType => {
   switch (quality) {
     case '128k':
