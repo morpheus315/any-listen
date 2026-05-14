@@ -33,5 +33,30 @@ export const createClientMusic = (main: MainCall) => {
     async createLocalMusicInfos(paths) {
       return main.createLocalMusicInfos(paths)
     },
+
+    async clearMusicOtherSource() {
+      return main.clearMusicOtherSource()
+    },
+    async getMusicOtherSourceCount() {
+      return main.getMusicOtherSourceCount()
+    },
+    async clearDislikeList() {
+      return main.clearDislikeList()
+    },
+    async getDislikeListCount() {
+      return main.getDislikeListCount()
+    },
+    async clearPlayCount() {
+      return main.clearPlayCount()
+    },
+    async getPlayCountCount() {
+      return main.getPlayCountCount()
+    },
+    async clearDownloadList() {
+      return main.clearDownloadList()
+    },
+    async getDownloadListCount() {
+      return main.getDownloadListCount()
+    },
   } satisfies Partial<AnyListen.IPC.ServerIPC>
 }

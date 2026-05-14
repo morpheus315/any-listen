@@ -33,5 +33,30 @@ export const createClientMusic = (ipcSocket: IPCSocket) => {
     async createLocalMusicInfos(paths) {
       return ipcSocket.remote.createLocalMusicInfos(paths)
     },
+
+    async clearMusicOtherSource() {
+      return ipcSocket.remote.clearMusicOtherSource()
+    },
+    async getMusicOtherSourceCount() {
+      return ipcSocket.remote.getMusicOtherSourceCount()
+    },
+    async clearDislikeList() {
+      return ipcSocket.remote.clearDislikeList()
+    },
+    async getDislikeListCount() {
+      return ipcSocket.remote.getDislikeListCount()
+    },
+    async clearPlayCount() {
+      return ipcSocket.remote.clearPlayCount()
+    },
+    async getPlayCountCount() {
+      return ipcSocket.remote.getPlayCountCount()
+    },
+    async clearDownloadList() {
+      return ipcSocket.remote.clearDownloadList()
+    },
+    async getDownloadListCount() {
+      return ipcSocket.remote.getDownloadListCount()
+    },
   } satisfies Partial<AnyListen.IPC.ServerIPC>
 }
