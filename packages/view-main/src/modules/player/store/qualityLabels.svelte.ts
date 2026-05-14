@@ -1,3 +1,5 @@
+import { buildSongCacheKey } from '@any-listen/common/tools'
+
 const STORAGE_KEY = 'online_quality_cache'
 const MAX_ENTRIES = 500
 
@@ -25,11 +27,12 @@ function saveToStorage(cache: Record<string, string>) {
 
 let cache = $state<Record<string, string>>(loadFromStorage())
 
-export function setQuality(songId: string, quality: string) {
-  cache = { ...cache, [songId]: quality }
+export function setQuality(musicInfo: AnyListen.Music.MusicInfo, quality: string) {
+  const key = buildSongCacheKey(musicInfo)
+  cache = { ...cache, [key]: quality }
   saveToStorage(cache)
 }
 
-export function getQuality(songId: string): string | undefined {
-  return cache[songId]
+export function getQuality(musicInfo: AnyListen.Music.MusicInfo): string | undefined {
+  return cache[buildSongCacheKey(musicInfo)]
 }

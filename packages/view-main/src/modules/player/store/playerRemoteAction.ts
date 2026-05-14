@@ -1,11 +1,12 @@
 import { createCache } from '@any-listen/common/cache'
+import { buildSongCacheKey } from '@any-listen/common/tools'
 
 import { lyricEvent } from '@/modules/lyric/store/event'
 import { musicLibraryEvent } from '@/modules/musicLibrary/store/event'
 import { getMusicPic as getMusicPicFromRemote, getMusicUrl as getMusicUrlFromRemote } from '@/shared/ipc/music'
 import { sendPlayerEvent, sendPlayHistoryListAction } from '@/shared/ipc/player'
 import { playerActionEvent, playHistoryListActionEvent } from '@/shared/ipc/player/event'
-import { cacheSongPic, songMetaCache } from './songMetaCache.svelte'
+import { cacheSongPic, getSongMeta, songMetaCache } from './songMetaCache.svelte'
 
 import * as commit from './commit'
 import { playerEvent } from './event'
@@ -45,23 +46,22 @@ const handleGetMusicPicFromRemote = async (info: AnyListen.IPCMusic.GetMusicPicI
 }
 
 const handleGetMusicPic = async (info: AnyListen.IPCMusic.GetMusicPicInfo) => {
-  // console.log('handleGetMusicPicFromRemote', info.musicInfo.name, info.isRefresh)
-  if (picRemoteGettingPromises.has(info.musicInfo.id)) return picRemoteGettingPromises.get(info.musicInfo.id)!
+  const songKey = buildSongCacheKey(info.musicInfo)
+  if (picRemoteGettingPromises.has(songKey)) return picRemoteGettingPromises.get(songKey)!
   const promise = handleGetMusicPicFromRemote(info)
     .then((urlInfo) => {
-      picCache.set(info.musicInfo.id, urlInfo)
-      picCacheQueue.push(info.musicInfo.id)
+      picCache.set(songKey, urlInfo)
+      picCacheQueue.push(songKey)
       if (picCacheQueue.length > 100) {
         picCache.delete(picCacheQueue.shift()!)
       }
-      // Persist to localStorage cache
-      cacheSongPic(info.musicInfo.id, urlInfo.url)
+      cacheSongPic(info.musicInfo, urlInfo.url)
       return urlInfo
     })
     .finally(() => {
-      picRemoteGettingPromises.delete(info.musicInfo.id)
+      picRemoteGettingPromises.delete(songKey)
     })
-  picRemoteGettingPromises.set(info.musicInfo.id, promise)
+  picRemoteGettingPromises.set(songKey, promise)
 
   return promise
 }
@@ -76,7 +76,7 @@ const getPicFromCache = (id: string) => {
 
 export const getMusicPic = async (info: AnyListen.IPCMusic.GetMusicPicInfo): Promise<AnyListen.IPCMusic.MusicPicInfo> => {
   if (!info.isRefresh) {
-    const cache = getPicFromCache(info.musicInfo.id)
+    const cache = getPicFromCache(buildSongCacheKey(info.musicInfo))
     if (cache) return cache
 
     if (info.musicInfo.meta.picUrl) {
@@ -87,7 +87,7 @@ export const getMusicPic = async (info: AnyListen.IPCMusic.GetMusicPicInfo): Pro
     }
 
     // Check persistent cache
-    const cached = songMetaCache.get(info.musicInfo.id)
+    const cached = getSongMeta(info.musicInfo)
     if (cached?.picUrl) {
       return { url: cached.picUrl, isFromCache: true }
     }
@@ -121,7 +121,7 @@ const findUpdatedMusic = (targetId: string, infos: Map<string, AnyListen.Music.M
 }
 export const getMusicPicDelay = (info: AnyListen.IPCMusic.GetMusicPicInfo, onUrl: (url: string) => void) => {
   if (!info.isRefresh) {
-    const cache = getPicFromCache(info.musicInfo.id)
+    const cache = getPicFromCache(buildSongCacheKey(info.musicInfo))
     if (cache) {
       onUrl(cache.url)
       return
@@ -180,7 +180,8 @@ let prevProgress = {
   currentTime: 0,
 }
 export const getMusicUrl = async (info: AnyListen.IPCMusic.GetMusicUrlInfo): Promise<AnyListen.IPCMusic.MusicUrlInfo> => {
-  let key = `${info.musicInfo.id}_${info.quality}_${info.isRefresh}`
+  const songKey = buildSongCacheKey(info.musicInfo)
+  let key = `${songKey}_${info.quality}_${info.isRefresh}`
 
   if (getOtherSourcePromises.has(key)) return getOtherSourcePromises.get(key)!
 

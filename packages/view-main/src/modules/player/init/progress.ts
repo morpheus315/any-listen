@@ -107,7 +107,7 @@ export const initProgress = () => {
               ...playerState.playMusicInfo.musicInfo,
               interval,
             })
-            cacheSongInterval(playerState.playMusicInfo.musicInfo.id, interval)
+            cacheSongInterval(playerState.playMusicInfo.musicInfo, interval)
           }
         })
       )

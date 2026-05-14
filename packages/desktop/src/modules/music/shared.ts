@@ -1,4 +1,5 @@
 import { existTimeExp } from '@any-listen/app/modules/music/utils'
+import { buildSongCacheKey } from '@any-listen/common/tools'
 
 import { appState } from '@/app'
 import { checkAndCreateDir, joinPath, tmpdir } from '@/shared/utils'
@@ -11,8 +12,7 @@ export const getTempDir = async () => {
 }
 
 export const getCachedLyricInfo = async (musicInfo: AnyListen.Music.MusicInfo): Promise<AnyListen.Music.LyricInfo | null> => {
-  let lrcInfo = await workers.dbService.getRawLyric(musicInfo.id)
-  // lrcInfo = {} as unknown as AnyListen.Player.LyricInfo
+  let lrcInfo = await workers.dbService.getRawLyric(buildSongCacheKey(musicInfo))
   if (existTimeExp.test(lrcInfo.lyric)) {
     return lrcInfo
   }
@@ -20,7 +20,7 @@ export const getCachedLyricInfo = async (musicInfo: AnyListen.Music.MusicInfo): 
 }
 
 export const saveLyricInfo = async (musicInfo: AnyListen.Music.MusicInfo, info: AnyListen.Music.LyricInfo) => {
-  await workers.dbService.rawLyricSave(musicInfo.id, info)
+  await workers.dbService.rawLyricSave(buildSongCacheKey(musicInfo), info)
 }
 
 // TODO rawlrcInfo s2t

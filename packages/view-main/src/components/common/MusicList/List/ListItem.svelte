@@ -9,7 +9,7 @@
   import { onMount, tick } from 'svelte'
   import { getMusicPicDelay } from '@/modules/player/store/actions'
   import { getQuality } from '@/modules/player/store/qualityLabels.svelte'
-  import { songMetaCache } from '@/modules/player/store/songMetaCache.svelte'
+  import { getSongMeta } from '@/modules/player/store/songMetaCache.svelte'
   // console.log(querystring)
   let {
     musicinfo,
@@ -37,13 +37,13 @@
   let sourceLabel = $derived.by(() => {
     const base = buildSourceLabel(musicinfo)
     if (musicinfo.isLocal || listid === 'search') return base
-    const q = getQuality(musicinfo.id)
+    const q = getQuality(musicinfo)
     return q ? `${base} · ${q}` : base
   })
 
   let displayInterval = $derived.by(() => {
     if (musicinfo.interval) return musicinfo.interval
-    const cached = songMetaCache.get(musicinfo.id)
+    const cached = getSongMeta(musicinfo)
     return cached?.interval || '--/--'
   })
   let picUrl = $state<null | string>(null)

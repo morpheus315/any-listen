@@ -89,8 +89,14 @@ export const logFormat = (log: AnyListen.LogInfo) => {
   return `${dateFormat(log.timestamp)} ${log.type.toUpperCase()} ${log.message}`
 }
 
+/** Build a source-prefixed cache key to avoid ID collisions across different music sources */
+export const buildSongCacheKey = (musicInfo: AnyListen.Music.MusicInfo): string => {
+  if (musicInfo.isLocal) return musicInfo.id
+  return `${musicInfo.meta.source}_${musicInfo.id}`
+}
+
 export const buildMusicCacheId = (musicInfo: AnyListen.Music.MusicInfo, quality: string) => {
-  return `${musicInfo.id}_${quality}`
+  return `${buildSongCacheKey(musicInfo)}_${quality}`
 }
 export const getFileType = (quality: string): AnyListen.Music.FileType => {
   switch (quality) {
