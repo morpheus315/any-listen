@@ -24,6 +24,38 @@ jobs:
 
       - run: pnpm install
 
+      - name: Bump version from tag
+        shell: bash
+        run: |
+          TAG=${{ github.ref_name }}
+          VERSION=${TAG#v}
+          echo "Bumping to version: $VERSION"
+          node -e "
+          const fs = require('fs');
+          const path = require('path');
+
+          // Update desktop package.json
+          const pkgPath = 'packages/desktop/package.json';
+          const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+          pkg.version = '$VERSION';
+          fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+          console.log('Updated ' + pkgPath + ' to ' + pkg.version);
+
+          // Update version.json
+          const vjPath = 'packages/desktop/publish/version.json';
+          let vj = { version: '', desc: '', time: '', history: [], beta: [] };
+          if (fs.existsSync(vjPath)) {
+            vj = JSON.parse(fs.readFileSync(vjPath, 'utf-8'));
+          }
+          if (vj.version) {
+            vj.history = [{ version: vj.version, desc: vj.desc, time: vj.time }, ...(vj.history || [])];
+          }
+          vj.version = '$VERSION';
+          vj.time = new Date().toISOString();
+          fs.writeFileSync(vjPath, JSON.stringify(vj));
+          console.log('Updated ' + vjPath + ' to ' + vj.version);
+          "
+
       - run: pnpm build:desktop
       - run: pnpm -F desktop pack:win:7z:x64
 
