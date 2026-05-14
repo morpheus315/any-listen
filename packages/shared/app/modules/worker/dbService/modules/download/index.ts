@@ -1,6 +1,6 @@
 import { arrPush, arrUnshift } from '@any-listen/common/utils'
 
-import { clearDownloadList, deleteDownloadList, inertDownloadList, queryDownloadList, updateDownloadList } from './dbHelper'
+import { clearDownloadList, countDownloadList, deleteDownloadList, inertDownloadList, queryDownloadList, updateDownloadList } from './dbHelper'
 
 let list: AnyListen.Download.ListItem[]
 
@@ -119,4 +119,8 @@ export const downloadInfoRemove = (ids: string[]) => {
  */
 export const downloadInfoClear = () => {
   clearDownloadList()
+}
+
+export const downloadInfoCount = () => {
+  return countDownloadList()
 }

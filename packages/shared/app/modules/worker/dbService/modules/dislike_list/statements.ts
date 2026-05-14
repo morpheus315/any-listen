@@ -38,6 +38,10 @@ export const createClearStatement = () => {
   `)
 }
 
+export const createCountStatement = () => {
+  return dbPrepare<[], { count: number }>('SELECT COUNT(*) as count FROM "main"."dislike_list"')
+}
+
 // /**
 //  * 创建不喜欢记录删除语句
 //  * @returns 删除语句

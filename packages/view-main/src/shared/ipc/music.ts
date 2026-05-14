@@ -30,3 +30,28 @@ export const clearMusicLyric: AnyListen.IPC.ServerIPC['clearMusicLyric'] = async
 export const createLocalMusicInfos: AnyListen.IPC.ServerIPC['createLocalMusicInfos'] = async (paths) => {
   return ipc.createLocalMusicInfos(paths)
 }
+
+export const clearMusicOtherSource: AnyListen.IPC.ServerIPC['clearMusicOtherSource'] = async () => {
+  return ipc.clearMusicOtherSource()
+}
+export const getMusicOtherSourceCount: AnyListen.IPC.ServerIPC['getMusicOtherSourceCount'] = async () => {
+  return ipc.getMusicOtherSourceCount()
+}
+export const clearDislikeList: AnyListen.IPC.ServerIPC['clearDislikeList'] = async () => {
+  return ipc.clearDislikeList()
+}
+export const getDislikeListCount: AnyListen.IPC.ServerIPC['getDislikeListCount'] = async () => {
+  return ipc.getDislikeListCount()
+}
+export const clearPlayCount: AnyListen.IPC.ServerIPC['clearPlayCount'] = async () => {
+  return ipc.clearPlayCount()
+}
+export const getPlayCountCount: AnyListen.IPC.ServerIPC['getPlayCountCount'] = async () => {
+  return ipc.getPlayCountCount()
+}
+export const clearDownloadList: AnyListen.IPC.ServerIPC['clearDownloadList'] = async () => {
+  return ipc.clearDownloadList()
+}
+export const getDownloadListCount: AnyListen.IPC.ServerIPC['getDownloadListCount'] = async () => {
+  return ipc.getDownloadListCount()
+}

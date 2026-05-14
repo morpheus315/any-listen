@@ -41,3 +41,12 @@ export function setQuality(musicInfo: AnyListen.Music.MusicInfo, quality: string
 export function getQuality(musicInfo: AnyListen.Music.MusicInfo): string | undefined {
   return cache[buildSongCacheKey(musicInfo)]
 }
+
+export function clearAllQualities() {
+  cache = {}
+  saveToStorage(cache)
+}
+
+export function getQualityCount(): number {
+  return Object.keys(cache).length
+}

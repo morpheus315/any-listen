@@ -55,4 +55,15 @@ export function getSongMeta(musicInfo: AnyListen.Music.MusicInfo): CachedMeta | 
   return songMetaCache[cacheKey(musicInfo)]
 }
 
+export function clearAllMeta() {
+  for (const key of Object.keys(songMetaCache)) {
+    delete songMetaCache[key]
+  }
+  saveCache(songMetaCache)
+}
+
+export function getMetaCount(): number {
+  return Object.keys(songMetaCache).length
+}
+
 export { songMetaCache }

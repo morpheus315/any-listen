@@ -70,3 +70,8 @@ export const createUpdatePositionStatement = () => {
     SET "position"=@position
     WHERE "id"=@id`)
 }
+
+export const createCountStatement = () => {
+  const db = getDB()
+  return db.prepare<[], { count: number }>('SELECT COUNT(*) as count FROM "main"."download_list"')
+}

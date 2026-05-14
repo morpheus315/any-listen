@@ -77,6 +77,23 @@ declare namespace AnyListen {
 
       /** 批量创建本地音乐信息 */
       createLocalMusicInfos: (filePaths: string[]) => Promise<Music.MusicInfoLocal[]>
+
+      /** 清理其他源音乐信息缓存 */
+      clearMusicOtherSource: () => void
+      /** 获取其他源音乐信息缓存数量 */
+      getMusicOtherSourceCount: () => number
+      /** 清理不喜欢列表 */
+      clearDislikeList: () => void
+      /** 获取不喜欢列表数量 */
+      getDislikeListCount: () => number
+      /** 清理播放统计 */
+      clearPlayCount: () => void
+      /** 获取播放统计数量 */
+      getPlayCountCount: () => number
+      /** 清理下载列表 */
+      clearDownloadList: () => void
+      /** 获取下载列表数量 */
+      getDownloadListCount: () => number
     }>
     type ServerIPCActions<Socket = undefined> = IPC.WarpIPCHandlerActions<Socket, ServerActions>
   }

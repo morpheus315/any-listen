@@ -2,6 +2,7 @@ import { getDB } from '../../db'
 import {
   createQueryStatement,
   createInsertStatement,
+  createCountStatement,
   createDeleteStatement,
   createUpdateStatement,
   createUpdatePositionStatement,
@@ -63,4 +64,9 @@ export const updateDownloadList = (urlInfo: AnyListen.DBService.DownloadMusicInf
 export const clearDownloadList = () => {
   const clearStatement = createClearStatement()
   clearStatement.run()
+}
+
+export const countDownloadList = () => {
+  const countStatement = createCountStatement()
+  return countStatement.get()!.count
 }

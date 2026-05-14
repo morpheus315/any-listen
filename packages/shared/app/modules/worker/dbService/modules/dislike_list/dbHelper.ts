@@ -4,6 +4,7 @@ import {
   // createDeleteStatement,
   // createUpdateStatement,
   createClearStatement,
+  createCountStatement,
   createInsertStatement,
   createQueryStatement,
   type DislikeInfo,
@@ -67,10 +68,15 @@ export const overwirteDislikeList = async (infos: DislikeInfo[]) => {
 //   })(infos)
 // }
 
-// /**
-//  * 清空不喜欢歌曲列表
-//  */
-// export const clearDislikeList = () => {
-//   const clearStatement = createClearStatement()
-//   clearStatement.run()
-// }
+/**
+ * 清空不喜欢歌曲列表
+ */
+export const clearDislikeList = () => {
+  const clearStatement = createClearStatement()
+  clearStatement.run()
+}
+
+export const countDislikeList = () => {
+  const countStatement = createCountStatement()
+  return countStatement.get()!.count
+}

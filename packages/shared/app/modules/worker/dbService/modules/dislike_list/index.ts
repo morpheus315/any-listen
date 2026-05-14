@@ -1,6 +1,6 @@
 import { SPLIT_CHAR } from '@any-listen/common/constants'
 
-import { inertDislikeList, overwirteDislikeList, queryDislikeList } from './dbHelper'
+import { clearDislikeList, countDislikeList, inertDislikeList, overwirteDislikeList, queryDislikeList } from './dbHelper'
 import type { DislikeInfo } from './statements'
 
 // let dislikeInfo: AnyListen.Dislike.DislikeInfo
@@ -90,9 +90,13 @@ export const dislikeInfoOverwrite = async (rules: string) => {
 //   deleteDislikeList(ids)
 // }
 
-// /**
-//  * 清空不喜欢列表
-//  */
-// export const dislikeInfoClear = () => {
-//   clearDislikeList()
-// }
+/**
+ * 清空不喜欢列表
+ */
+export const dislikeInfoClear = () => {
+  clearDislikeList()
+}
+
+export const dislikeListCount = () => {
+  return countDislikeList()
+}
