@@ -213,4 +213,4 @@ tables.set(
 
 export default tables
 
-export const DB_VERSION = '2'
+export const DB_VERSION = '3'

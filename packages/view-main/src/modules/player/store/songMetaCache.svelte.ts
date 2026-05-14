@@ -1,6 +1,7 @@
 import { buildSongCacheKey } from '@any-listen/common/tools'
 
 const STORAGE_KEY = 'song_meta_cache'
+const CACHE_VERSION = 2
 const MAX_ENTRIES = 500
 
 interface CachedMeta {
@@ -12,7 +13,9 @@ function loadCache(): Record<string, CachedMeta> {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
-      const entries = JSON.parse(raw) as [string, CachedMeta][]
+      const data = JSON.parse(raw)
+      if (data.version !== CACHE_VERSION) return {}
+      const entries = data.entries as [string, CachedMeta][]
       return Object.fromEntries(entries.slice(-MAX_ENTRIES))
     }
   } catch {}
@@ -25,7 +28,7 @@ function saveCache(cache: Record<string, CachedMeta>) {
   saveTimer = setTimeout(() => {
     try {
       const entries = Object.entries(cache).slice(-MAX_ENTRIES)
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries))
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: CACHE_VERSION, entries }))
     } catch {}
   }, 500)
 }
