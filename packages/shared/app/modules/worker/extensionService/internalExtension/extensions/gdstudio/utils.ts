@@ -74,6 +74,7 @@ export async function apiRequest(
     }
 
     const url = buildUrl(API_BASE, params)
+    console.log(`[gdstudio] request: ${url}`)
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -89,7 +90,13 @@ export async function apiRequest(
 
     const data = await response.json()
 
-    if (!retryOnEmpty || !isEmptyResponse(data)) return data
+    if (!retryOnEmpty || !isEmptyResponse(data)) {
+      const summary = typeof data === 'object' && data != null
+        ? (Array.isArray(data) ? `array[${data.length}]` : `keys:${Object.keys(data).join(',')}`)
+        : typeof data
+      console.log(`[gdstudio] response: status=${response.status} type=${summary}`)
+      return data
+    }
 
     if (attempt < MAX_RETRIES) {
       console.log(`[gdstudio] empty response, will retry`)

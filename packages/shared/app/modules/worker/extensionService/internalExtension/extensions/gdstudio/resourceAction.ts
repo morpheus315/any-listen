@@ -65,6 +65,8 @@ export const resourceActions: Partial<AnyListen.IPCExtension.ResourceAction> = {
       br = QUALITY_BR_MAP[params.quality]
     }
 
+    console.log(`[gdstudio] musicUrl: song="${musicInfo.name}" id=${musicInfo.meta.musicId} requestedQuality=${params.quality ?? 'none'} requestBr=${br}`)
+
     const result = await apiRequest({
       types: 'url',
       source: apiSource,
@@ -78,6 +80,7 @@ export const resourceActions: Partial<AnyListen.IPCExtension.ResourceAction> = {
     }
 
     const quality = BR_QUALITY_MAP[data.br as number] || '128k'
+    console.log(`[gdstudio] musicUrl result: actualBr=${data.br as number} actualQuality=${quality}`)
 
     return {
       url: data.url as string,

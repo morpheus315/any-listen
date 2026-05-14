@@ -99,6 +99,7 @@ const getMusicPlayUrl = async (
   return getMusicUrl({ musicInfo, isRefresh, quality: settingState.setting['player.playQuality'] })
     .then(({ url, quality }) => {
       if (!musicInfo.isLocal && quality) {
+        console.log(`[playerActions] setQuality: song="${musicInfo.name}" id=${musicInfo.id} quality="${quality}" isFromCache=${url.length > 100}`)
         setQuality(musicInfo.id, quality)
       }
       if (diffCurrentMusicInfo(musicInfo)) return null

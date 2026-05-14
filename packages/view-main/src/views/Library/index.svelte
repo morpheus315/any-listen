@@ -16,7 +16,6 @@
   import { LIST_IDS } from '@any-listen/common/constants'
   import { resourceList } from '@/modules/extension/reactive.svelte'
   import { LIST_PIC_ICON } from '@/shared/constants'
-  import { getQualityVersion } from '@/modules/player/store/qualityLabels.svelte'
 
   let list = $state.raw<AnyListen.Music.MusicInfo[]>([])
   let musicList = $state<ComponentExports<typeof MusicList> | null>(null)
@@ -110,14 +109,7 @@
     }
   })
 
-  let prevVersion = $state(0)
-  $effect(() => {
-    const v = getQualityVersion()
-    if (v !== prevVersion && list.length) {
-      prevVersion = v
-      list = [...list]
-    }
-  })
+
 </script>
 
 <div class="view-container container">

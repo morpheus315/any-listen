@@ -184,13 +184,17 @@ export const getMusicUrl = async (info: AnyListen.IPCMusic.GetMusicUrlInfo): Pro
 
   if (getOtherSourcePromises.has(key)) return getOtherSourcePromises.get(key)!
 
+  console.log(`[renderer] getMusicUrl: song="${info.musicInfo.name}" id=${info.musicInfo.id} quality=${info.quality} isRefresh=${info.isRefresh}`)
   const promise = new Promise<AnyListen.IPCMusic.MusicUrlInfo>((resolve, reject) => {
     let timeout: null | number = setTimeout(() => {
       timeout = null
       reject(new Error('find music timeout'))
     }, 15_000)
     getMusicUrlFromRemote(info)
-      .then(resolve)
+      .then((result) => {
+        console.log(`[renderer] getMusicUrl response: song="${info.musicInfo.name}" isFromCache=${result.isFromCache} quality="${result.quality}"`)
+        resolve(result)
+      })
       .catch(reject)
       .finally(() => {
         if (timeout) clearTimeout(timeout)

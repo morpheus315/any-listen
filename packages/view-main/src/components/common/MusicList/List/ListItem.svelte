@@ -8,7 +8,7 @@
   import { buildSourceLabel } from '@any-listen/common/tools'
   import { onMount, tick } from 'svelte'
   import { getMusicPicDelay } from '@/modules/player/store/actions'
-  import { currentQualities } from '@/modules/player/store/qualityLabels.svelte'
+  import { getQuality } from '@/modules/player/store/qualityLabels.svelte'
   import { songMetaCache } from '@/modules/player/store/songMetaCache.svelte'
   // console.log(querystring)
   let {
@@ -37,7 +37,7 @@
   let sourceLabel = $derived.by(() => {
     const base = buildSourceLabel(musicinfo)
     if (musicinfo.isLocal || listid === 'search') return base
-    const q = currentQualities.get(musicinfo.id)
+    const q = getQuality(musicinfo.id)
     return q ? `${base} · ${q}` : base
   })
 

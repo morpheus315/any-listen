@@ -28,8 +28,9 @@ export const getMusicUrlByExtSource = async ({
   quality?: string
 }): Promise<AnyListen.IPCMusic.MusicUrlInfo> => {
   const targetQuality = quality ?? appState.appSetting['player.playQuality']
-  const cachedUrl = await workers.dbService.getMusicUrl(buildMusicCacheId(musicInfo, targetQuality))
-  if (cachedUrl && !isRefresh) return { isFromCache: true, quality: targetQuality, url: cachedUrl }
+  const cacheId = buildMusicCacheId(musicInfo, targetQuality)
+  const cached = await workers.dbService.getMusicUrl(cacheId)
+  if (cached && !isRefresh) return { isFromCache: true, quality: cached.quality, url: cached.url }
   const info = await getMusicUrlByExtensionSource({
     musicInfo,
     quality: targetQuality,
@@ -55,14 +56,14 @@ export const getMusicUrl = async ({
 }): Promise<AnyListen.IPCMusic.MusicUrlInfo> => {
   const targetQuality = quality ?? appState.appSetting['player.playQuality']
   const id = buildMusicCacheId(musicInfo, targetQuality)
-  const cachedUrl = await workers.dbService.getMusicUrl(id)
-  if (cachedUrl && !isRefresh) return { isFromCache: true, quality: targetQuality, url: cachedUrl }
+  const cached = await workers.dbService.getMusicUrl(id)
+  if (cached && !isRefresh) return { isFromCache: true, quality: cached.quality, url: cached.url }
   const info = await getMusicUrlResource({
     musicInfo,
     quality: targetQuality,
     type: getFileType(targetQuality),
   })
-  void workers.dbService.musicUrlSave([{ id, url: info.url }])
+  void workers.dbService.musicUrlSave([{ id, url: info.url, quality: info.quality }])
   return {
     quality: info.quality,
     url: info.url,

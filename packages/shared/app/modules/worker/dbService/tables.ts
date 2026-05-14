@@ -149,6 +149,7 @@ tables.set(
   CREATE TABLE "music_url" (
     "id" TEXT NOT NULL,
     "url" TEXT NOT NULL,
+    "quality" TEXT NOT NULL DEFAULT '',
     UNIQUE("id") ON CONFLICT REPLACE
   );
 `
@@ -212,4 +213,4 @@ tables.set(
 
 export default tables
 
-export const DB_VERSION = '1'
+export const DB_VERSION = '2'

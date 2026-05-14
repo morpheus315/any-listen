@@ -2,13 +2,12 @@ import { clearMusicUrl, countMusicUrl, deleteMusicUrl, inertMusicUrl, queryMusic
 import type { MusicUrlInfo } from './statements'
 
 /**
- * 获取歌曲url
+ * 获取歌曲url信息
  * @param id 歌曲id
- * @returns 歌曲url
+ * @returns url和音质信息
  */
-export const getMusicUrl = (id: string): string | null => {
-  const url = queryMusicUrl(id)
-  return url
+export const getMusicUrl = (id: string): MusicUrlInfo | null => {
+  return queryMusicUrl(id)
 }
 
 /**
