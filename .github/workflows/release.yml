@@ -29,10 +29,12 @@ jobs:
         run: |
           TAG=${{ github.ref_name }}
           VERSION=${TAG#v}
+          DESC=$(git tag -l --format='%(contents)' "$TAG")
           echo "Bumping to version: $VERSION"
+          echo "Tag description: ${DESC:0:200}..."
+          export DESC
           node -e "
           const fs = require('fs');
-          const path = require('path');
 
           // Update desktop package.json
           const pkgPath = 'packages/desktop/package.json';
@@ -50,10 +52,13 @@ jobs:
           if (vj.version) {
             vj.history = [{ version: vj.version, desc: vj.desc, time: vj.time }, ...(vj.history || [])];
           }
+          // Use tag description as changelog, fallback to v prefix marker
+          vj.desc = process.env.DESC || '$VERSION';
           vj.version = '$VERSION';
           vj.time = new Date().toISOString();
           fs.writeFileSync(vjPath, JSON.stringify(vj));
           console.log('Updated ' + vjPath + ' to ' + vj.version);
+          console.log('Desc: ' + vj.desc.substring(0, 100) + '...');
           "
 
       - run: pnpm build:desktop
