@@ -79,7 +79,7 @@ export const resourceActions: Partial<AnyListen.IPCExtension.ResourceAction> = {
       throw new Error(`No playable URL returned from API: ${JSON.stringify(result)}`)
     }
 
-    const quality = BR_QUALITY_MAP[data.br as number] || '128k'
+    const quality = BR_QUALITY_MAP[data.br as number] || `${data.br}Kbps`
     console.log(`[gdstudio] musicUrl result: actualBr=${data.br as number} actualQuality=${quality}`)
 
     return {
