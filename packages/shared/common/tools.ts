@@ -89,10 +89,18 @@ export const logFormat = (log: AnyListen.LogInfo) => {
   return `${dateFormat(log.timestamp)} ${log.type.toUpperCase()} ${log.message}`
 }
 
-/** Build a source-prefixed cache key to avoid ID collisions across different music sources */
-export const buildSongCacheKey = (musicInfo: AnyListen.Music.MusicInfo): string => {
+/** Build a source-prefixed id to avoid collisions across different music sources. Idempotent. */
+export const buildSongId = (musicInfo: AnyListen.Music.MusicInfo): string => {
   if (musicInfo.isLocal) return musicInfo.id
+  // Already prefixed — don't double-encode
+  if (musicInfo.id.startsWith(`${musicInfo.meta.source}_`)) return musicInfo.id
   return `${musicInfo.meta.source}_${musicInfo.id}`
+}
+
+export const buildSongCacheKey = buildSongId
+
+export const buildMusicCacheId = (musicInfo: AnyListen.Music.MusicInfo, quality: string) => {
+  return `${buildSongCacheKey(musicInfo)}_${quality}`
 }
 
 export const buildMusicCacheId = (musicInfo: AnyListen.Music.MusicInfo, quality: string) => {

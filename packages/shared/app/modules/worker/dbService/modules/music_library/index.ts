@@ -1,4 +1,5 @@
 import { LIST_IDS } from '@any-listen/common/constants'
+import { buildSongId } from '@any-listen/common/tools'
 import { arrPush, arrPushByPosition, arrUnshift } from '@any-listen/common/utils'
 
 import {
@@ -46,7 +47,7 @@ const toDBListInfo = (listInfos: AnyListen.List.MyListInfo[], offset = 0): UserL
 const toDBMusicInfo = (musicInfos: AnyListen.Music.MusicInfo[], listId: string, offset = 0): MusicInfo[] => {
   return musicInfos.map((info, index) => {
     return {
-      id: info.id,
+      id: buildSongId(info),
       interval: info.interval,
       is_local: info.isLocal ? 1 : 0,
       list_id: listId,
