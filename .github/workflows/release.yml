@@ -33,7 +33,6 @@ jobs:
           files: |
             build/*.exe
             build/*.7z
-            packages/desktop/publish/version.json
           draft: false
           prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') }}
 

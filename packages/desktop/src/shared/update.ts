@@ -47,17 +47,16 @@ class UpdateEvent {
   }
 }
 
-const enName = 'YW55LWxpc3Rlbg=='
-const name = Buffer.from(enName, 'base64').toString()
-const pkgName = `${name}-desktop`
+const owner = 'morpheus315'
+const repo = 'any-listen'
 const address = [
-  [`https://raw.githubusercontent.com/${name}/${name}/main/packages/desktop/publish/version.json`, 'direct'],
-  [`https://registry.npmjs.org/@${name}/${pkgName}/latest`, 'npm'],
-  [`https://cdn.jsdelivr.net/gh/${name}/${name}/packages/desktop/publish/version.json`, 'direct'],
-  [`https://fastly.jsdelivr.net/gh/${name}/${name}/packages/desktop/publish/version.json`, 'direct'],
-  [`https://gcore.jsdelivr.net/gh/${name}/${name}/packages/desktop/publish/version.json`, 'direct'],
-  [`https://registry.npmmirror.com/@${name}/${pkgName}/latest`, 'npm'],
-  ['http://cdn.stsky.cn/any-listen/desktop/version.json', 'direct'],
+  [`https://raw.githubusercontent.com/${owner}/${repo}/main/packages/desktop/publish/version.json`, 'direct'],
+  [`https://cdn.jsdelivr.net/gh/${owner}/${repo}/packages/desktop/publish/version.json`, 'direct'],
+  [`https://fastly.jsdelivr.net/gh/${owner}/${repo}/packages/desktop/publish/version.json`, 'direct'],
+  [`https://gcore.jsdelivr.net/gh/${owner}/${repo}/packages/desktop/publish/version.json`, 'direct'],
+  // [`https://registry.npmjs.org/@${repo}/${repo}-desktop/latest`, 'npm'],
+  // [`https://registry.npmmirror.com/@${repo}/${repo}-desktop/latest`, 'npm'],
+  // ['http://cdn.stsky.cn/any-listen/desktop/version.json', 'direct'],
 ] as const
 
 const getDirectInfo = async (url: string) => {
