@@ -6,7 +6,7 @@ import { musicLibraryEvent } from '@/modules/musicLibrary/store/event'
 import { getMusicPic as getMusicPicFromRemote, getMusicUrl as getMusicUrlFromRemote } from '@/shared/ipc/music'
 import { sendPlayerEvent, sendPlayHistoryListAction } from '@/shared/ipc/player'
 import { playerActionEvent, playHistoryListActionEvent } from '@/shared/ipc/player/event'
-import { cacheSongPic, getSongMeta, songMetaCache } from './songMetaCache.svelte'
+import { cacheSongPic, getSongMeta } from './songMetaCache.svelte'
 
 import * as commit from './commit'
 import { playerEvent } from './event'
