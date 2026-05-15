@@ -53,6 +53,7 @@ const options = {
       provider: 'github',
       owner: 'morpheus315',
       repo: 'any-listen',
+      releaseType: 'release',
     },
   ],
 }
