@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.9.2 (2026-05-15)
+
+### 变更
+- CI 发布改用 electron-builder publish 模式，生成 latest.yml 支持自动更新
+
 ## v0.9.1 (2026-05-15)
 
 ### 优化
