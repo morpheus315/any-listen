@@ -60,22 +60,27 @@ const address = [
 ] as const
 
 const getDirectInfo = async (url: string) => {
+  console.log(`[update] fetching direct: ${url}`)
   return request<Partial<AnyListen.UpdateInfo>>(url).then(({ body }) => {
-    if (body.version == null) throw new Error('failed')
+    if (body.version == null) throw new Error('version field missing')
+    console.log(`[update] direct response: version=${body.version} time=${body.time}`)
     return body as AnyListen.UpdateInfo
   })
 }
 
 const getNpmPkgInfo = async (url: string) => {
+  console.log(`[update] fetching npm: ${url}`)
   return request<{ versionInfo?: string }>(url).then(({ body }) => {
-    if (!body.versionInfo) throw new Error('failed')
+    if (!body.versionInfo) throw new Error('versionInfo missing')
     const info = JSON.parse(body.versionInfo) as Partial<AnyListen.UpdateInfo>
-    if (info.version == null) throw new Error('failed')
+    if (info.version == null) throw new Error('version field missing')
+    console.log(`[update] npm response: version=${info.version}`)
     return info as AnyListen.UpdateInfo
   })
 }
 export const getUpdateInfo = async (index = 0): Promise<AnyListen.UpdateInfo> => {
   const [url, source] = address[index]
+  console.log(`[update] trying source ${index + 1}/${address.length}: ${source} ${url}`)
   let promise: Promise<AnyListen.UpdateInfo>
   switch (source) {
     case 'direct':
@@ -87,8 +92,12 @@ export const getUpdateInfo = async (index = 0): Promise<AnyListen.UpdateInfo> =>
   }
 
   return promise.catch(async (err: Error) => {
+    console.log(`[update] source ${index + 1} failed: ${err.message}`)
     index++
-    if (index >= address.length) throw err
+    if (index >= address.length) {
+      console.log(`[update] all ${address.length} sources exhausted`)
+      throw err
+    }
     return getUpdateInfo(index)
   })
 }
@@ -105,8 +114,12 @@ export class Update extends UpdateEvent {
   }
   async checkUpdateStatus(isAutoUpdate: boolean) {
     if (!this.info) return false
-    const latest = getLatestVersion(this.info, appState.appSetting['common.allowPreRelease'])
-    if (compareVersions(appState.version.version, latest.version) < 0) {
+    const allowPre = appState.appSetting['common.allowPreRelease']
+    const latest = getLatestVersion(this.info, allowPre)
+    const localVer = appState.version.version
+    console.log(`[update] local=${localVer} remote=${latest.version} allowPreRelease=${allowPre} autoUpdate=${isAutoUpdate}`)
+    if (compareVersions(localVer, latest.version) < 0) {
+      console.log(`[update] update available: ${localVer} -> ${latest.version}`)
       await checkUpdate(appState.appSetting['common.allowPreRelease'])
         .then(() => {
           if (isAutoUpdate) {
@@ -123,14 +136,17 @@ export class Update extends UpdateEvent {
       this.emit('update_available', this.info)
       return true
     }
+    console.log(`[update] already up to date (${localVer} >= ${latest.version})`)
     this.emit('update_not_available', this.info)
     return false
   }
   async checkForUpdates(isAutoUpdate: boolean) {
+    console.log(`[update] checkForUpdates start, autoUpdate=${isAutoUpdate}`)
     this.emit('checking_for_update')
     try {
       this.info = await getUpdateInfo()
     } catch (err) {
+      console.log(`[update] checkForUpdates failed: ${(err as Error).message}`)
       this.emit('error', err as Error)
       return false
     }
