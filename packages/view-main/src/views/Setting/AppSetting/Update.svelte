@@ -5,7 +5,7 @@
   import { useDownloadProgress, useVersionInfo } from '@/modules/version/reactive.svelte'
   import { t } from '@/plugins/i18n'
   import { dateFormat, sizeFormate } from '@/shared'
-  import { openDevTools } from '@/shared/ipc/app'
+  import { checkUpdate, openDevTools } from '@/shared/ipc/app'
   let versionInfo = useVersionInfo()
   let progress = useDownloadProgress()
   const allowPreRelease = useSettingValue('common.allowPreRelease')
@@ -34,6 +34,19 @@
         : $t('settings.update.init')
       : ''
   )
+
+  let checking = $state(false)
+
+  const handleCheckUpdate = async () => {
+    checking = true
+    try {
+      await checkUpdate()
+    } catch {
+      // error handled by event listener
+    } finally {
+      checking = false
+    }
+  }
 
   const latestVersion = $derived(
     versionInfo.val.newVersion?.beta && allowPreRelease.val
@@ -84,8 +97,15 @@
         {$t('settings.update.open_version_modal_btn')}
       </Btn>
     </div>
-  {:else if versionInfo.val.status == 'checking'}
+  {:else if versionInfo.val.status == 'checking' || checking}
     <div class="p small">{$t('settings.update.checking')}</div>
+  {/if}
+  {#if versionInfo.val.status !== 'checking' && !checking}
+    <div class="p">
+      <Btn min onclick={handleCheckUpdate}>
+        {$t('settings.update.check_btn')}
+      </Btn>
+    </div>
   {/if}
 </div>
 

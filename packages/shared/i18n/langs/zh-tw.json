@@ -380,6 +380,7 @@
   "settings.update.downloading": "發現新版本並在努力下載中，請稍後...⏳",
   "settings.update.init": "處理更新中...",
   "settings.update.latest": "軟體已是最新，盡情地體驗吧~🥂",
+  "settings.update.check_btn": "手動檢查更新",
   "settings.update.latest_label": "最新版本：",
   "settings.update.new_version": "發現新版本，趕快去更新吧~🚀🚀",
   "settings.update.open_version_modal_btn": "開啟更新視窗",

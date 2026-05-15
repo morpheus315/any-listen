@@ -380,6 +380,7 @@
   "settings.update.downloading": "Update is found and being downloaded...⏳",
   "settings.update.init": "Updating...",
   "settings.update.latest": "The app is up-to-date. Enjoy yourself!🥂",
+  "settings.update.check_btn": "Check for Updates",
   "settings.update.latest_label": "Latest version: ",
   "settings.update.new_version": "Found a new version. Hurry up and update~🚀🚀",
   "settings.update.open_version_modal_btn": "Open Update Window",

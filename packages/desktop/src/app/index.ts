@@ -235,7 +235,7 @@ const listenerAppEvent = () => {
       void app.setProxy(buildElectronProxyConfig(appState.proxy.host, appState.proxy.port))
     } catch {}
     handleProxyChange()
-    if (process.env.NODE_ENV === 'production') void startCheckUpdateTimeout()
+    void startCheckUpdateTimeout()
   })
   appEvent.on('proxy_changed', (host, port, electronProxy) => {
     setProxyByHost(host, port)
