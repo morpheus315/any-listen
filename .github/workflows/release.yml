@@ -74,9 +74,10 @@ jobs:
 
       - name: Build and publish to GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
+        working-directory: packages/desktop
         env:
           GH_TOKEN: ${{ github.token }}
-        run: node packages/desktop/build-config/build-pack.cjs target=win arch=x64 type=setup,green publish=always
+        run: node build-config/build-pack.cjs target=win arch=x64 type=setup,green publish=always
 
       - uses: actions/upload-artifact@v4
         if: github.event_name == 'workflow_dispatch'
