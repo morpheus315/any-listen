@@ -66,61 +66,63 @@
 
 <TitleContent name={$t('settings.other.music_cache')}>
   <div class="settings-item-content">
-    <div class="gap-top">
-      <p class="p">
-        {$t('settings.other.music_url_cache')}{musicUrlCacheSize}
-        {#if musicUrlCacheSize}
-          <Btn min onclick={() => handleClear(clearMusicUrl, { set: (v) => musicUrlCacheSize = v })}>{$t('settings.other.clear_music_url_cache')}</Btn>
-        {/if}
-      </p>
-      <p class="p">
-        {$t('settings.other.music_lyric_cache')}{musicLyricCacheSize}
-        {#if musicLyricCacheSize}
-          <Btn min onclick={() => handleClear(clearMusicLyric, { set: (v) => musicLyricCacheSize = v })}>{$t('settings.other.clear_music_lyric_cache')}</Btn>
-        {/if}
-      </p>
-      <p class="p">
-        {$t('settings.other.quality_label_cache')}{qualityLabelSize}
-        {#if qualityLabelSize}
-          <Btn min onclick={() => { clearAllQualities(); qualityLabelSize = 0; showNotify($t('settings.other.clear_cache_success')) }}>{$t('settings.other.clear_quality_label_cache')}</Btn>
-        {/if}
-      </p>
-      <p class="p">
-        {$t('settings.other.song_meta_cache')}{songMetaCacheSize}
-        {#if songMetaCacheSize}
-          <Btn min onclick={() => { clearAllMeta(); songMetaCacheSize = 0; showNotify($t('settings.other.clear_cache_success')) }}>{$t('settings.other.clear_song_meta_cache')}</Btn>
-        {/if}
-      </p>
-      <p class="p">
-        {$t('settings.other.music_other_source_cache')}{otherSourceSize}
-        {#if otherSourceSize}
-          <Btn min onclick={() => handleClear(clearMusicOtherSource, { set: (v) => otherSourceSize = v })}>{$t('settings.other.clear_music_other_source_cache')}</Btn>
-        {/if}
-      </p>
-      <p class="p">
-        {$t('settings.other.play_count_cache')}{playCountSize}
-        {#if playCountSize}
-          <Btn min onclick={() => handleClear(clearPlayCount, { set: (v) => playCountSize = v })}>{$t('settings.other.clear_play_count_cache')}</Btn>
-        {/if}
-      </p>
-      <p class="p">
-        {$t('settings.other.download_list_cache')}{downloadListSize}
-        {#if downloadListSize}
-          <Btn min onclick={() => handleClear(clearDownloadList, { set: (v) => downloadListSize = v })}>{$t('settings.other.clear_download_list_cache')}</Btn>
-        {/if}
-      </p>
-      <p class="p clear-all">
+    <div class="gap-top cache-list">
+      <div class="cache-row">
+        <span>{$t('settings.other.music_url_cache')}{musicUrlCacheSize}</span>
+        <Btn min disabled={!musicUrlCacheSize} onclick={() => handleClear(clearMusicUrl, { set: (v) => musicUrlCacheSize = v })}>{$t('settings.other.clear_music_url_cache')}</Btn>
+      </div>
+      <div class="cache-row">
+        <span>{$t('settings.other.music_lyric_cache')}{musicLyricCacheSize}</span>
+        <Btn min disabled={!musicLyricCacheSize} onclick={() => handleClear(clearMusicLyric, { set: (v) => musicLyricCacheSize = v })}>{$t('settings.other.clear_music_lyric_cache')}</Btn>
+      </div>
+      <div class="cache-row">
+        <span>{$t('settings.other.quality_label_cache')}{qualityLabelSize}</span>
+        <Btn min disabled={!qualityLabelSize} onclick={() => { clearAllQualities(); qualityLabelSize = 0; showNotify($t('settings.other.clear_cache_success')) }}>{$t('settings.other.clear_quality_label_cache')}</Btn>
+      </div>
+      <div class="cache-row">
+        <span>{$t('settings.other.song_meta_cache')}{songMetaCacheSize}</span>
+        <Btn min disabled={!songMetaCacheSize} onclick={() => { clearAllMeta(); songMetaCacheSize = 0; showNotify($t('settings.other.clear_cache_success')) }}>{$t('settings.other.clear_song_meta_cache')}</Btn>
+      </div>
+      <div class="cache-row">
+        <span>{$t('settings.other.music_other_source_cache')}{otherSourceSize}</span>
+        <Btn min disabled={!otherSourceSize} onclick={() => handleClear(clearMusicOtherSource, { set: (v) => otherSourceSize = v })}>{$t('settings.other.clear_music_other_source_cache')}</Btn>
+      </div>
+      <div class="cache-row">
+        <span>{$t('settings.other.play_count_cache')}{playCountSize}</span>
+        <Btn min disabled={!playCountSize} onclick={() => handleClear(clearPlayCount, { set: (v) => playCountSize = v })}>{$t('settings.other.clear_play_count_cache')}</Btn>
+      </div>
+      <div class="cache-row">
+        <span>{$t('settings.other.download_list_cache')}{downloadListSize}</span>
+        <Btn min disabled={!downloadListSize} onclick={() => handleClear(clearDownloadList, { set: (v) => downloadListSize = v })}>{$t('settings.other.clear_download_list_cache')}</Btn>
+      </div>
+      <div class="cache-row clear-all">
+        <div></div>
         <Btn disabled={!musicUrlCacheSize && !musicLyricCacheSize && !qualityLabelSize && !songMetaCacheSize && !otherSourceSize && !playCountSize && !downloadListSize} onclick={handleClearAll}>
           {$t('settings.other.clear_all_cache')}
         </Btn>
-      </p>
+      </div>
     </div>
   </div>
 </TitleContent>
 
 <style lang="less">
+  .cache-list {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 6px;
+  }
+  .cache-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 28px;
+    :global(button) {
+      min-width: 130px;
+      text-align: center;
+    }
+  }
   .clear-all {
-    margin-top: 8px;
+    margin-top: 6px;
     padding-top: 8px;
     border-top: 1px solid var(--color-border);
   }
