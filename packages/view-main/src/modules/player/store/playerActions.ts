@@ -303,6 +303,7 @@ const handlePlayList = async (
     commit.setPlayListId(listId, isOnline)
   }
   if (targetPlayMusicInfo == null) {
+    console.log('handlePlayList targetList first 5:', targetList.slice(0, 5).map((m: AnyListen.Music.MusicInfo) => m.name))
     const newList = createPlayMusicInfoList({
       musicInfos: targetList,
       listId,
