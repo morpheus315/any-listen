@@ -14,14 +14,10 @@ export const playMusic = async (listId: string, musicInfo: AnyListen.Music.Music
   const list = sourceList ?? await getListMusics(listId)
   const idx = list.findIndex((m) => m.id == musicInfo.id)
   if (idx < 0) {
-    if (list.length === 0 && !sourceList) {
-      if (!musicInfo.isLocal) void playOnlineList(listId, [musicInfo], 0, isClianHistory)
-    }
+    if (list.length === 0 && !sourceList && !musicInfo.isLocal) void playOnlineList(listId, [musicInfo], 0, isClianHistory)
     return
   }
-  void (musicInfo.isLocal
-    ? playList(listId, list, idx, isClianHistory)
-    : playOnlineList(listId, list, idx, isClianHistory))
+  void playList(listId, list, idx, isClianHistory)
 }
 
 let clickTime = 0
