@@ -292,6 +292,7 @@ const handlePlayList = async (
 ) => {
   const prevListId = playerState.playInfo.listId
   setPause()
+  commit.setIsLinkedList(false)
   const targetMusicInfo = targetList[index]
   let targetPlayMusicInfo: AnyListen.Player.PlayMusicInfo | undefined
   if (prevListId == listId) {
@@ -303,7 +304,6 @@ const handlePlayList = async (
     commit.setPlayListId(listId, isOnline)
   }
   if (targetPlayMusicInfo == null) {
-    console.log('handlePlayList targetList first 5:', targetList.slice(0, 5).map((m: AnyListen.Music.MusicInfo) => m.name))
     const newList = createPlayMusicInfoList({
       musicInfos: targetList,
       listId,
