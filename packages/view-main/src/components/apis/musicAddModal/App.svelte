@@ -4,6 +4,7 @@
   import { defaultLists, useUserList } from '@/modules/musicLibrary/reactive.svelte'
   import { useListItemHeight } from '@/modules/app/reactive.svelte'
   import ListItem from './ListItem.svelte'
+  import { buildSongId } from '@any-listen/common/tools'
   import { getMusicExistListIds } from '@/modules/musicLibrary/actions'
   import { verticalScrollbar } from '@/shared/compositions/verticalScrollbar.svelte'
   import { addMusic, moveMusic } from './shared'
@@ -59,7 +60,7 @@
     musicInfos = _musicInfos
     existListIds = []
     if (musicInfos.length == 1) {
-      void getMusicExistListIds(musicInfos[0].id).then((ids) => {
+      void getMusicExistListIds(buildSongId(musicInfos[0])).then((ids) => {
         existListIds = ids
       })
     }
