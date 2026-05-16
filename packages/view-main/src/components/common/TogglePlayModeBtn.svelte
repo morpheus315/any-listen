@@ -20,10 +20,6 @@
       <svg version="1.1" xmlns="http://www.w3.org/2000/svg" height="80%" viewBox="0 0 24 24">
         <use xlink:href="#icon-list-loop" />
       </svg>
-    {:else if togglePlayMethod.val == 'random'}
-      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24">
-        <use xlink:href="#icon-list-random" />
-      </svg>
     {:else if togglePlayMethod.val == 'singleLoop'}
       <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24">
         <use xlink:href="#icon-list-single-loop" />
@@ -49,17 +45,6 @@
       >
         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" height="100%" viewBox="0 0 24 24">
           <use xlink:href="#icon-list-loop" />
-        </svg>
-      </button>
-      <button
-        class="btn"
-        aria-label={$t('player__play_toggle_mode_random')}
-        onclick={() => {
-          toggleMode('random')
-        }}
-      >
-        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 24 24">
-          <use xlink:href="#icon-list-random" />
         </svg>
       </button>
       <button

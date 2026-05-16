@@ -5,7 +5,7 @@ import { createUnsubscriptionSet } from '@/shared'
 
 import { onPlayerCreated } from '../shared'
 import { playerEvent } from '../store/event'
-import { getNextPlayMusicInfo, resetRandomNextMusicInfo } from '../store/playerActions'
+import { getNextPlayMusicInfo } from '../store/playerActions'
 import { getMusicUrl } from '../store/playerRemoteAction'
 import { playerState } from '../store/state'
 
@@ -98,7 +98,6 @@ export const initPreloadNextMusic = () => {
         settingEvent.on('updated', (keys) => {
           if (keys.includes('player.togglePlayMethod')) {
             if (!preloadMusicInfo.info || preloadMusicInfo.info.playLater) return
-            resetRandomNextMusicInfo()
             preloadMusicInfo.info = null
             preloadMusicInfo.preProgress = playerState.progress.nowPlayTime
           }

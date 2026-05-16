@@ -3,7 +3,6 @@
 
 import { LIST_IDS } from '@any-listen/common/constants'
 import { createPlayMusicInfoList } from '@any-listen/common/tools'
-import { getRandom } from '@any-listen/common/utils'
 import { checkPicUrl } from '@any-listen/web'
 
 import { addInfo } from '@/modules/dislikeList/actions'
@@ -15,8 +14,8 @@ import { parseInterval } from '@/shared'
 
 import * as commit from './commit'
 import { playerEvent } from './event'
-import { setPlayListMusic, setPlayListMusicPlayed, setPlayListMusicUnplayedAll } from './listRemoteAction'
-import { addPlayHistoryList, getMusicLyric, getMusicPic, getMusicUrl, setPlayHistoryList } from './playerRemoteAction'
+import { setPlayListMusic, setPlayListMusicUnplayedAll } from './listRemoteAction'
+import { getMusicLyric, getMusicPic, getMusicUrl, setPlayHistoryList } from './playerRemoteAction'
 import { setQuality } from './qualityLabels.svelte'
 import { playerState } from './state'
 
@@ -247,7 +246,6 @@ const setMetadata = async (info: AnyListen.Player.PlayMusicInfo) => {
 }
 export const setPlayMusicInfo = (info: AnyListen.Player.PlayMusicInfo | null, index?: number | null, historyListIndex = -1) => {
   const oldInfo = playerState.playMusicInfo
-  const oldHistoryIdx = playerState.playInfo.historyIndex
   if (info) {
     commit.setPlayMusicInfo(info)
     commit.setMusicInfo(buildPlayerMusicInfo(info.musicInfo))
@@ -268,23 +266,10 @@ export const setPlayMusicInfo = (info: AnyListen.Player.PlayMusicInfo | null, in
     commit.setMusicInfo(null)
     commit.updatePlayIndex(-1, -1, null)
   }
-  if (oldInfo) {
-    if (!oldInfo.playLater && settingState.setting['player.togglePlayMethod'] == 'random') {
-      if (!oldInfo.played) void setPlayListMusicPlayed([oldInfo.itemId])
-      if (
-        oldInfo.listId == playerState.playInfo?.listId &&
-        oldHistoryIdx < 0 &&
-        playerState.playHistoryList.at(-1)?.id != oldInfo.itemId
-      ) {
-        void addPlayHistoryList([{ id: oldInfo.itemId, time: Date.now() }])
-      }
-    }
-  }
 }
 
 // 处理音乐播放
 const handlePlay = () => {
-  resetRandomNextMusicInfo()
   const playMusicInfo = playerState.playMusicInfo
 
   if (!playMusicInfo) return
@@ -377,19 +362,6 @@ export const playId = (id: string, historyListIndex = -1) => {
   handlePlayMusicInfo(target, historyListIndex)
 }
 
-const randomNextMusicInfo = {
-  info: null as AnyListen.Player.PlayMusicInfo | null,
-  historyListIndex: -1,
-  isEnd: false,
-}
-export const resetRandomNextMusicInfo = () => {
-  if (randomNextMusicInfo.info) {
-    randomNextMusicInfo.info = null
-    randomNextMusicInfo.historyListIndex = -1
-    randomNextMusicInfo.isEnd = false
-  }
-}
-
 export const getNextPlayMusicInfo = async (): Promise<AnyListen.Player.PlayMusicInfo | null> => {
   const [playLaterList, playList] = parsePlayList()
   // 如果稍后播放列表存在歌曲则直接播放该列表的歌曲
@@ -417,40 +389,9 @@ export const getNextPlayMusicInfo = async (): Promise<AnyListen.Player.PlayMusic
   }
 
   let nextIndex = playerState.playInfo.index
-
   let togglePlayMethod = settingState.setting['player.togglePlayMethod']
-  if (togglePlayMethod == 'random') {
-    if (playerState.playInfo.historyIndex >= 0) {
-      let idx = playerState.playInfo.historyIndex + 1
-      while (idx < playerState.playHistoryList.length) {
-        const targetId = playerState.playHistoryList[idx].id
-        const targetMusicInfo = playerState.playList.find((m) => m.itemId === targetId)
-        if (targetMusicInfo) {
-          randomNextMusicInfo.info = targetMusicInfo
-          randomNextMusicInfo.historyListIndex = idx
-          return targetMusicInfo
-        }
-        idx++
-      }
-      // console.warn('play history id is not valid', idx, playerState.playHistoryList.length)
-    }
-    const curItemId = playerState.playMusicInfo?.itemId
-    const unPlayedList = playList.filter((m) => !m.played && m.itemId != curItemId)
-    let nextPlayMusicInfo: AnyListen.Player.PlayMusicInfo
-    let isEnd: boolean
-    if (unPlayedList.length) {
-      nextPlayMusicInfo = unPlayedList[getRandom(0, unPlayedList.length)]
-      isEnd = false
-    } else {
-      nextPlayMusicInfo = playList[getRandom(0, playList.length)]
-      isEnd = true
-    }
-    randomNextMusicInfo.info = nextPlayMusicInfo
-    randomNextMusicInfo.isEnd = isEnd
-    randomNextMusicInfo.historyListIndex = -1
-    return nextPlayMusicInfo
-  }
   switch (togglePlayMethod) {
+    case 'random':
     case 'listLoop':
       nextIndex = nextIndex == playList.length - 1 ? 0 : nextIndex + 1
       break
@@ -518,39 +459,10 @@ export const skipNext = async (isAutoSktp = false): Promise<void> => {
   }
 
   let togglePlayMethod = settingState.setting['player.togglePlayMethod']
-  if (togglePlayMethod == 'random') {
-    if (randomNextMusicInfo.info) {
-      const isEnd = randomNextMusicInfo.isEnd
-      handlePlayMusicInfo(randomNextMusicInfo.info, randomNextMusicInfo.historyListIndex)
-      if (isEnd) void setPlayListMusicUnplayedAll()
-      return
-    }
-    if (playerState.playInfo.historyIndex >= 0) {
-      let idx = playerState.playInfo.historyIndex + 1
-      while (idx < playerState.playHistoryList.length) {
-        const targetId = playerState.playHistoryList[idx].id
-        const targetMusicInfo = playerState.playList.find((m) => m.itemId === targetId)
-        if (targetMusicInfo) {
-          handlePlayMusicInfo(targetMusicInfo, idx)
-          return
-        }
-        idx++
-      }
-      // console.warn('play history id is not valid', idx, playerState.playHistoryList.length)
-    }
-    const curItemId = playerState.playMusicInfo?.itemId
-    const unPlayedList = playList.filter((m) => !m.played && m.itemId != curItemId)
-    if (unPlayedList.length) {
-      handlePlayMusicInfo(unPlayedList[getRandom(0, unPlayedList.length)])
-    } else {
-      handlePlayMusicInfo(playList[getRandom(0, playList.length)])
-      void setPlayListMusicUnplayedAll()
-    }
-    return
-  }
   if (!isAutoSktp) {
     // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
     switch (togglePlayMethod) {
+      case 'random':
       case 'list':
       case 'singleLoop':
       case 'none':
@@ -561,6 +473,7 @@ export const skipNext = async (isAutoSktp = false): Promise<void> => {
     ? playList.findIndex((m) => m.musicInfo.id == playerState.playInfo.lastTrackId)
     : -1
   switch (togglePlayMethod) {
+    case 'random':
     case 'listLoop':
       nextIndex = nextIndex == playList.length - 1 ? 0 : nextIndex + 1
       break
@@ -619,25 +532,10 @@ export const skipPrev = async (isAutoSktp = false): Promise<void> => {
   }
 
   let togglePlayMethod = settingState.setting['player.togglePlayMethod']
-  if (togglePlayMethod == 'random') {
-    if (playerState.playHistoryList.length) {
-      let idx = playerState.playInfo.historyIndex
-      idx = idx >= 0 ? idx - 1 : playerState.playHistoryList.length - 1
-      while (idx >= 0) {
-        const targetId = playerState.playHistoryList[idx].id
-        const targetMusicInfo = playerState.playList.find((m) => m.itemId === targetId)
-        if (targetMusicInfo) {
-          handlePlayMusicInfo(targetMusicInfo, idx)
-          return
-        }
-        idx--
-      }
-    }
-    return
-  }
   if (!isAutoSktp) {
     // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
     switch (togglePlayMethod) {
+      case 'random':
       case 'list':
       case 'singleLoop':
       case 'none':
@@ -654,6 +552,7 @@ export const skipPrev = async (isAutoSktp = false): Promise<void> => {
   } else nextIndex = -1
 
   switch (togglePlayMethod) {
+    case 'random':
     case 'listLoop':
     case 'list':
       nextIndex = nextIndex == 0 ? playList.length - 1 : nextIndex - 1

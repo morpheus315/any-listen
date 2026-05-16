@@ -5,7 +5,7 @@
   import List from './List/index.svelte'
   import type { ListInfo } from './type'
   import { updateSetting } from '@/modules/setting/store/action'
-  import { getRandom } from '@/shared'
+  import { arrShuffle } from '@/shared'
   import type { ComponentExports } from 'svelte'
   import MiniHeader from './MiniHeader.svelte'
   let {
@@ -66,10 +66,11 @@
           void playMusic(listinfo.id, list[0], true)
         }}
         onplayrandom={async () => {
-          if (settingState.setting['player.togglePlayMethod'] != 'random') {
-            await updateSetting({ 'player.togglePlayMethod': 'random' })
+          const shuffledList = arrShuffle([...list])
+          if (settingState.setting['player.togglePlayMethod'] != 'listLoop') {
+            await updateSetting({ 'player.togglePlayMethod': 'listLoop' })
           }
-          void playMusic(listinfo.id, list[getRandom(0, list.length)], true)
+          void playMusic(listinfo.id, shuffledList[0], true, shuffledList)
         }}
         onsort={() => {
           listsort = true
@@ -96,10 +97,11 @@
           void playMusic(listinfo.id, list[0], true)
         }}
         onplayrandom={async () => {
-          if (settingState.setting['player.togglePlayMethod'] != 'random') {
-            await updateSetting({ 'player.togglePlayMethod': 'random' })
+          const shuffledList = arrShuffle([...list])
+          if (settingState.setting['player.togglePlayMethod'] != 'listLoop') {
+            await updateSetting({ 'player.togglePlayMethod': 'listLoop' })
           }
-          void playMusic(listinfo.id, list[getRandom(0, list.length)], true)
+          void playMusic(listinfo.id, shuffledList[0], true, shuffledList)
         }}
         onsort={() => {
           listsort = true

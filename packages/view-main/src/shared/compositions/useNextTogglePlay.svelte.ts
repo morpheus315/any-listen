@@ -10,8 +10,6 @@ export const useNextTogglePlay = () => {
     switch (togglePlayMethod.val) {
       case 'listLoop':
         return i18n.t('player__play_toggle_mode_list_loop')
-      case 'random':
-        return i18n.t('player__play_toggle_mode_random')
       case 'singleLoop':
         return i18n.t('player__play_toggle_mode_single_loop')
       case 'list':
