@@ -10,15 +10,18 @@ import { settingState } from '@/modules/setting/store/state'
 import { i18n } from '@/plugins/i18n'
 import { clipboardWriteText, openDirInExplorer } from '@/shared/ipc/app'
 
-export const playMusic = async (listId: string, musicInfo: AnyListen.Music.MusicInfo, isClianHistory?: boolean) => {
-  const list = await getListMusics(listId)
+export const playMusic = async (listId: string, musicInfo: AnyListen.Music.MusicInfo, isClianHistory?: boolean, sourceList?: AnyListen.Music.MusicInfo[]) => {
+  const list = sourceList ?? await getListMusics(listId)
   const idx = list.findIndex((m) => m.id == musicInfo.id)
   if (idx < 0) {
-    // For online music not in a persisted list (e.g. search results), play directly
-    if (!musicInfo.isLocal) void playOnlineList(listId, [musicInfo], 0, isClianHistory)
+    if (list.length === 0 && !sourceList) {
+      if (!musicInfo.isLocal) void playOnlineList(listId, [musicInfo], 0, isClianHistory)
+    }
     return
   }
-  void playList(listId, list, idx, isClianHistory)
+  void (musicInfo.isLocal
+    ? playList(listId, list, idx, isClianHistory)
+    : playOnlineList(listId, list, idx, isClianHistory))
 }
 
 let clickTime = 0
